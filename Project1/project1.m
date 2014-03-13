@@ -14,6 +14,6 @@ numData_class_A = size(dataA,1);
 numData_class_B = size(dataB,1);
 % Find the mean vector of class A and class B
 for i=1:7
-mean_classA=mean(dataA);
-mean_classB=mean(dataB);
+mean_classA=mean(dataA,i);
+mean_classB=mean(dataB,i);
 end
