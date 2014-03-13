@@ -1,0 +1,39 @@
+\documentclass[10pt]{article} % Default font size and paper size
+\usepackage{amsmath}
+%\usepackage{fontspec} % For loading fonts
+%%\defaultfontfeatures{Mapping=tex-text}
+%\setmainfont{Fontin} % Main document font
+\usepackage{fullpage}
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage{hyperref}
+%\usepackage{xunicode,xltxtra,url,parskip} % Formatting %packages
+\title{\textsc{Assignment 2}}
+\author{Rahul Krishna\\{\color{blue} \href{mailto:rkrish11@ncsu.edu}{rkrish11@ncsu.edu}}}
+\usepackage[usenames,dvipsnames]{xcolor}
+\begin{document}
+\maketitle
+\noindent\textbf{3.1. To show that the perceptron loss function is a continuous piecewise linear function.}\\[0.2cm]
+The perceptron loss function is given by,\\
+\begin{equation}
+J(w) = \sum\limits_{x \in Y}^{} {({\delta _x}{w^T}x)}
+\end{equation}
+If we use the gradient descent method to minimize the cost function, the weight will change according to following relation,
+\begin{equation}
+w(n + 1) = w(n) - {\rho _n}\sum\limits_{x \in Y}^{} {{\delta _x}x}
+\end{equation}
+Here, n is the number of iterations. The variable $\rho_n$ determines the rate at which the algorithm converges to the local minima, the global minima or the saddle point. When we change the weight smoothly the cost function changes in a linear manner. Once the number of misclassified vector changes, the limits of the summation -- denoted by x$\in$Y-- changes and so does the cost function. Therefore, as long as the number of misclassified vectors remain the same the cost function changes linearly with the weight; once the number of misclassified vectors changes, the cost function changes altogether. This makes it a piecewise linear function.\\[0.625cm]
+\noindent\textbf{3.4 To compute a hyperplane using a perceptron algorithm}\\[0.25cm]
+We have 4 feature vectors and 2 classes $\omega_1$ and $\omega_2$. We'll first extend the feature vectors to a 2D space as below,
+\[\begin{gathered}
+  {\omega _1} = [0,{\text{ }}0,{\text{ }}1]{\text{ }}and{\text{ }}[0,{\text{ 1, 1}}] \hfill \\
+  {\omega _2} = [1,{\text{ }}0,{\text{ }}1]{\text{ }}and{\text{ }}[1,{\text{ 1, 1}}] \hfill \\
+\end{gathered} \]
+The initial weight at iteration 0 is given by $w(0)=[0, 0, 0]$. Also, $rho=1$.  To apply the perceptron algorithm using the reward and punishment form, we use the following 3 fundamental equations.\\[0.2cm]
+$\begin{array}{l}
+w(n + 1) = w(n) + p{\rm{ }}{x_n}{\hspace{5pt}\rm{if }}\hspace{2pt}{x_n}\in {w_1}{\hspace{2pt}\rm{and }}\hspace{2pt}{w^T}(n){x_n} \le 0\\
+w(n + 1) = w(n) - p{\rm{ }}{x_n}{\hspace{5pt}\rm{if }}\hspace{2pt}{x_n}\in {w_2}{\hspace{2pt}\rm{and }}\hspace{2pt}{w^T}(n){x_n} \ge 0\\
+w(n + 1) = w(n){\hspace{34pt}\rm{elsewise}}
+\end{array}$\\[0.2cm]
+Using these the following computations can be made,
+
+\end{document} 
