@@ -1,0 +1,17 @@
+% Load data
+load('data.mat');
+% Split data according to their labels. The labels are available in the
+% last column, they are -1 and +1. 
+for i=1:size(1:size(data,1))
+if(data(i,8)<0)
+dataA=data(:,1:7);
+else
+dataB=data(:,1:7);
+end
+end
+[numData_class_A, numData_class_B] = [size(dataA,1), size(dataB,1)]
+% Find the mean vector of class A and class B
+mean_classA=zeros(1,7);
+mean_classB=zeros(1,7);
+
+mean_classA(1:7)=mean(data(1:numData_class_A,1:7),1:7);
