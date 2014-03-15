@@ -1,12 +1,13 @@
-%% Non-parametric optimization using kNN optimization medthod.
+%% Probablistic classification using Naive Bayes.
 % Authored by Rahul Krishna. Dated- Thursday, March 15th 2014
 %# image size
 % Load data
 load('data.mat');
 clc,
-disp('Non-parametric optimization using kNN optimization medthod');
+disp('Naive Bayes classification');
 % Split data according to their labels. The labels are available in the
 % last column, they are -1 and +1.
+tr_testRatio=4;
 j=1;
 k=1;
 for i=1:size(data,1)
@@ -19,16 +20,23 @@ end
 numData_class_A = size(dataA,1);
 numData_class_B = size(dataB,1);
 
-sA=cov(dataA);
-sB=cov(dataB);
-
-
 % Training Vectors
+
+% Compute mean, and variance of the training vectors. 
+% Since we don't know the pdf of the data set we can make a maximum entropy
+% estimate. We can compute the mean and variance of the training dataset
+% and assume that the pdf is normally distributed.
 
 numtrainA = randperm(numData_class_A);
 trainDataA = dataA(numtrainA(1:floor(numData_class_B*tr_testRatio/10)),:);
 numtrainB = randperm(numData_class_B);
 trainDataB = dataB(numtrainB(1:floor(numData_class_B*tr_testRatio/10)),:);
+% Compute the variance.
+varVectA=diag(cov(trainDataA));
+varVectB=diag(cov(trainDataB));
+% Compute the mean.
+meanVectA=mean(trainDataA,1);
+meanVectB=mean(trainDataB,1);
 
 trainData= [trainDataA ; trainDataB];
 trainClass = [-ones(size(trainDataA,1),1); ones(size(trainDataB,1),1)];

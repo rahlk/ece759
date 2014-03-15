@@ -1,4 +1,4 @@
-%% Non-parametric optimization using kNN optimization medthod.
+%% Probablistic classification using Naive Bayes.
 % Authored by Rahul Krishna. Dated- Thursday, March 15th 2014
 %# image size
 % Load data
@@ -20,16 +20,18 @@ end
 numData_class_A = size(dataA,1);
 numData_class_B = size(dataB,1);
 
-sA=cov(dataA);
-sB=cov(dataB);
-
-
 % Training Vectors
 
 numtrainA = randperm(numData_class_A);
 trainDataA = dataA(numtrainA(1:floor(numData_class_B*tr_testRatio/10)),:);
 numtrainB = randperm(numData_class_B);
 trainDataB = dataB(numtrainB(1:floor(numData_class_B*tr_testRatio/10)),:);
+
+varVectA=diag(cov(trainDataA));
+varVectB=diag(cov(trainDataB));
+
+meanVectA=mean(trainDataA,1);
+meanVectB=mean(trainDataB,1);
 
 trainData= [trainDataA ; trainDataB];
 trainClass = [-ones(size(trainDataA,1),1); ones(size(trainDataB,1),1)];
