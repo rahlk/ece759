@@ -1,15 +1,17 @@
 %% Probablistic classification using Naive Bayes.
 % Authored by Rahul Krishna. Dated- Thursday, March 15th 2014
-%# image size
-% Load data
+
 load('data.mat');
 clc,
 disp('Naive Bayes classification');
+
 % Split data according to their labels. The labels are available in the
 % last column, they are -1 and +1.
-tr_testRatio=4;
+
+for tr_testRatio=1:9;
 j=1;
 k=1;
+
 for i=1:size(data,1)
 if(data(i,8)<0)
 dataA(j,1:7)=data(i,1:7); j=j+1;
@@ -17,38 +19,47 @@ else
 dataB(k,1:7)=data(i,1:7); k=k+1;
 end
 end
+
 numData_class_A = size(dataA,1);
 numData_class_B = size(dataB,1);
 
 % Training Vectors
 
+% Compute mean, and variance of the training vectors. 
+% Since we don't know the pdf of the data set we can make a maximum entropy
+% estimate. We can compute the mean and variance of the training dataset
+% and assume that the pdf is normally distributed.
+
 numtrainA = randperm(numData_class_A);
 trainDataA = dataA(numtrainA(1:floor(numData_class_B*tr_testRatio/10)),:);
 numtrainB = randperm(numData_class_B);
 trainDataB = dataB(numtrainB(1:floor(numData_class_B*tr_testRatio/10)),:);
-
+% Compute the variance.
 varVectA=diag(cov(trainDataA));
 varVectB=diag(cov(trainDataB));
-
+varVect=[varVectA';varVectB'];
+% Compute the mean.
 meanVectA=mean(trainDataA,1);
 meanVectB=mean(trainDataB,1);
-
+meanVect=[meanVectA;meanVectB];
+% Concatenate the training data.
 trainData= [trainDataA ; trainDataB];
 trainClass = [-ones(size(trainDataA,1),1); ones(size(trainDataB,1),1)];
 
-% Test data
-
+% Define test data
 testDataA=dataA(ceil(numData_class_B*tr_testRatio/10):end,:);
 testDataB=dataB(ceil(numData_class_B*tr_testRatio/10):end,:);
 testData= [testDataA; testDataB];
 testClass = [-ones(size(testDataA,1),1); ones(size(testDataB,1),1)];
 
+% Probablity of classes
+pA=numData_class_A/(numData_class_A+numData_class_B);
+pB=numData_class_B/(numData_class_A+numData_class_B);
 
-[l, c]=size(m);
-[l,N]=size(X);
-for i=1:N
-    for j=1:c
-        t(j)=P(j)*comp_gauss_dens_val(m(:,j),S(:,:,j),X(:,i));
-    end
-    [num, z(i)]=max(t);
+resClass_Label=nBayes(testData, meanVect, varVect);
+classErr(tr_testRatio)=sum(resClass_Label~=testClass)/sum(testClass==testClass)*100;
+fprintf('Training to testing ratio = %d:%d\n',tr_testRatio,(10-tr_testRatio));
+fprintf('Classification Error = %0.2f\n',classErr);
 end
+plot(classErr)
+
