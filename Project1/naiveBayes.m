@@ -8,7 +8,6 @@ disp('Naive Bayes classification');
 % Split data according to their labels. The labels are available in the
 % last column, they are -1 and +1.
 
-for tr_testRatio=1:9;
 j=1;
 k=1;
 
@@ -23,16 +22,18 @@ end
 numData_class_A = size(dataA,1);
 numData_class_B = size(dataB,1);
 
+numtrainA = randperm(numData_class_A);
+numtrainB = randperm(numData_class_B);
+
 % Training Vectors
 
 % Compute mean, and variance of the training vectors. 
 % Since we don't know the pdf of the data set we can make a maximum entropy
 % estimate. We can compute the mean and variance of the training dataset
 % and assume that the pdf is normally distributed.
+for tr_testRatio=1:9
 
-numtrainA = randperm(numData_class_A);
-trainDataA = dataA(numtrainA(1:floor(numData_class_B*tr_testRatio/10)),:);
-numtrainB = randperm(numData_class_B);
+trainDataA = dataA(numtrainA(1:floor(numData_class_A*tr_testRatio/10)),:);
 trainDataB = dataB(numtrainB(1:floor(numData_class_B*tr_testRatio/10)),:);
 % Compute the variance.
 varVectA=diag(cov(trainDataA));
@@ -62,4 +63,4 @@ fprintf('Training to testing ratio = %d:%d\n',tr_testRatio,(10-tr_testRatio));
 fprintf('Classification Error = %0.2f\n',classErr);
 end
 plot(classErr)
-
+clear classErr
