@@ -1,24 +1,65 @@
-%
-load('data.mat');
-k=11;
-covMat={};
-% find the K smallest distances assign the corresponding points to be
-% neighbours of Xi
-[D, ni] = findNN(data, k);
-len=size(data,1);
-% Create matrix Z consisting of all neighbours of Xi
-for m=1:len
-    for n=1:k
-        Z(m,n,:)=data(ni(m,n),1:7);
-        % Subtract Xi from every column of Z and compute the local covariance
-        % C=Z'*Z
-        Y(m,n,:)=squeeze(Z(m,n,:))'-data(m,1:7);
-    end
-    covMat=cov(squeeze(Y(m,:,:)));
-% If K>D, the local covariance will not be full rank, and it should be 
-% regularized by seting C=C+eps*I where I is the identity matrix and 
-% eps is a small constant of order 1e-3*trace(C). 
-% This ensures that the system to be solved in step 2 has a unique solution.
-covMat=covMat+1e-3*trace(covMat)*eye(size(covMat,1));
+X=importdata('data.mat')';
+K=11; % K Nearest Neighbor 
+d=3; % Reduced Dimesionality
+[D,N] = size(X);
+fprintf(1,'LLE running on %d points in %d dimensions\n',N,D);
 
+
+% STEP1: COMPUTE PAIRWISE DISTANCES & FIND NEIGHBORS 
+fprintf(1,'-->Finding %d nearest neighbours.\n',K);
+
+X2 = sum(X.^2,1);
+distance = repmat(X2,N,1)+repmat(X2',1,N)-2*X'*X;
+
+[sorted,index] = sort(distance);
+neighborhood = index(2:(1+K),:);
+
+
+
+% STEP2: SOLVE FOR RECONSTRUCTION WEIGHTS
+fprintf(1,'-->Solving for reconstruction weights.\n');
+
+if(K>D) 
+  fprintf(1,'   [note: K>D; regularization will be used]\n'); 
+  tol=1e-3; % regularlizer in case constrained fits are ill conditioned
+else
+  tol=0;
 end
+
+W = zeros(K,N);
+for ii=1:N
+   z = X(:,neighborhood(:,ii))-repmat(X(:,ii),1,K); % shift ith pt to origin
+   C = z'*z;                                        % local covariance
+   C = C + eye(K,K)*tol*trace(C);                   % regularlization (K>D)
+   W(:,ii) = C\ones(K,1);                           % solve Cw=1
+   W(:,ii) = W(:,ii)/sum(W(:,ii));                  % enforce sum(w)=1
+end;
+
+
+% STEP 3: COMPUTE EMBEDDING FROM EIGENVECTS OF COST MATRIX M=(I-W)'(I-W)
+fprintf(1,'-->Computing embedding.\n');
+
+% M=eye(N,N); % use a sparse matrix with storage for 4KN nonzero elements
+M = sparse(1:N,1:N,ones(1,N),N,N,4*K*N); 
+for ii=1:N
+   w = W(:,ii);
+   jj = neighborhood(:,ii);
+   M(ii,jj) = M(ii,jj) - w';
+   M(jj,ii) = M(jj,ii) - w;
+   M(jj,jj) = M(jj,jj) + w*w';
+end;
+
+% CALCULATION OF EMBEDDING
+options.disp = 0; options.isreal = 1; options.issym = 1; 
+[Y,eigenvals] = eigs(M,d+1,0,options);
+Y = Y(:,2:d+1)'*sqrt(N); % bottom evect is [1,1,1,1...] with eval 0
+
+
+fprintf(1,'Done.\n');
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% other possible regularizers for K>D
+%   C = C + tol*diag(diag(C));                       % regularlization
+%   C = C + eye(K,K)*tol*trace(C)*K;                 % regularlization

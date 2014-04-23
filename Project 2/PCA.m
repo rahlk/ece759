@@ -1,20 +1,23 @@
+function dataOut=PCA(data,label,d)
 %% PRINCIPAL COMPONENT ANALYSIS %%
-
-% Obtain Data
-load('data.mat');
+% data = Input data matrix of size [NxD]. label = Input class labels of
+% size [Nx1]. d = Number of output dimensions (scalar).
+% dataOut -> an [Nx(d+1)] matrix. The first [Nxd] matrix is data with the
+% reduced dimensionality
 % Subtract the mean from the original data and obtain covariance matrix
 mu = repmat(mean(data(:,1:7),1),size(data,1),1);
 newData=data(:,1:7)-mu;
 covMat=cov(newData);
 % Get the eigen vectors and values
 [eigVect, eigVal]=eig(covMat);
-
+fVect=[];
 % Generate the feature vector
-fVect=[eigVect(:,7)'];%eigVect(:,6)'];%eigVect(:,5)']; %eigVect(:,4)'];
-
+for i=1:d
+fVect=[fVect; eigVect(:,8-i)'];
+end
 % Final Data
 fData=(fVect*newData');
-fData=[fData;data(:,8)'];
-fData=fData';
-
-save fVectPCA fData
+fData=[fData;label']; % Append label
+dataOut=fData';
+% save fVectPCA fData
+end
