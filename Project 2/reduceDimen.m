@@ -26,6 +26,8 @@ switch varargin{3}
     case 'PCA'
         disp('Principal Component Analysis')
         Y=PCA(X(:,1:7),X(:,8),d);
+    case 'MDS'
+        Y=MDS(X(:,1:7),d);
     otherwise
         error('Invalid method chosen: use PCA or LLE')        
 end
@@ -123,6 +125,13 @@ if savedata=='Y'|savedata=='y'
     disp('File Saved.')
 end
 end
-
-
+%% Multidimensional Scaling
+function dataOut=MDS(X,d)
+% Setup squared proximity matrix
+fprintf('--> Computing proximity matrix..\n');
+prox=pdist2(X(:,1:7),X(:,1:7));
+fprintf('--> Performing MDS...\n');
+dataOut=mdscale(prox,d);
+end
+%% END OF CODE
 
